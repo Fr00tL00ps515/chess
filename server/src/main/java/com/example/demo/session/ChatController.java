@@ -21,6 +21,6 @@ public class ChatController {
     @SendTo("/topic/messages")
     public Greeting handleMove(Greeting greeting) {
         System.out.println("Got message: " + greeting.text());
-        return new Greeting("Hi Client");
+        return new Greeting("Hi  Client");
     }
 }

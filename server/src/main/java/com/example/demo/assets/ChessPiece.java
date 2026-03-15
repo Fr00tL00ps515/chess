@@ -4,13 +4,16 @@ package com.example.demo.assets;
 public abstract class ChessPiece {
 
     public String owner;
+    public String letter;
     public boolean playerAboveBoard;
-    public int[] pos = new int[2];
+    public int posRow;
+    public int posCol;
 
-    public ChessPiece(int row, int col, boolean playerAboveBoard) {
-        pos[0] = row;
-        pos[1] = col;
+    public ChessPiece(int row, int col, boolean playerAboveBoard, String owner) {
+        posRow = row;
+        posCol = col;
         this.playerAboveBoard = playerAboveBoard;
+        this.owner = owner;
     }
 
     public abstract boolean canMove(int row, int col, ChessPiece[][] board);
@@ -19,14 +22,14 @@ public abstract class ChessPiece {
     public boolean pathIsFree(int row, int col, ChessPiece[][] board) {
         int oneStepRight = 0;
         int oneStepBelow = 0;
-        if (pos[0] == row && pos[1] == col)
+        if (posRow == row && posCol == col)
             return true;
         if (board[row][col] != null)
             return false;
-        oneStepBelow = (row - pos[0]) / Math.abs(row - pos[0]);
-        oneStepRight = (col - pos[1]) / Math.abs(col - pos[1]);
+        oneStepBelow = (row - posRow) / Math.abs(row - posRow);
+        oneStepRight = (col - posCol) / Math.abs(col - posCol);
         // Move Right/Left
-        for (int ver = pos[0] + oneStepBelow, hor = pos[1] + oneStepRight; ver != row
+        for (int ver = posRow + oneStepBelow, hor = posCol + oneStepRight; ver != row
                 || hor != col; ver += oneStepBelow, hor += oneStepRight) {
             if (board[ver][hor] != null)
                 return false;
@@ -39,8 +42,9 @@ class Pawn extends ChessPiece {
 
     public boolean hasTwoSteps = true;
 
-    public Pawn(int row, int col, boolean playerAboveBoard) {
-        super(row, col, playerAboveBoard);
+    public Pawn(int row, int col, boolean playerAboveBoard, String owner) {
+        super(row, col, playerAboveBoard, owner);
+        letter = "P";
     }
 
     public void firstMove() {
@@ -48,30 +52,31 @@ class Pawn extends ChessPiece {
     }
 
     public boolean canMove(int row, int col, ChessPiece[][] board) {
-        if (pos[0] == row && pos[1] == col)
+        if (posRow == row && posCol == col)
             return true;
-        if (pos[1] != col || col < 0 || row < 0 || col > 7 || row > 7)
+        if (posCol != col || col < 0 || row < 0 || col > 7 || row > 7)
             return false;
 
         if (!pathIsFree(row, col, board))
             return false;
         if (playerAboveBoard) {
-            return row == (pos[0] + 1) || row == (pos[0] + 2) && hasTwoSteps ? true : false;
+            return row == (posRow + 1) || row == (posRow + 2) && hasTwoSteps ? true : false;
         }
-        return row == (pos[0] - 1) || row == (pos[0] - 2) && hasTwoSteps ? true : false;
+        return row == (posRow - 1) || row == (posRow - 2) && hasTwoSteps ? true : false;
     }
 }
 
 class Rook extends ChessPiece {
 
-    public Rook(int row, int col, boolean playerAboveBoard) {
-        super(row, col, playerAboveBoard);
+    public Rook(int row, int col, boolean playerAboveBoard, String owner) {
+        super(row, col, playerAboveBoard, owner);
+        letter = "R";
     }
 
     public boolean canMove(int row, int col, ChessPiece[][] board) {
-        if (pos[0] == row && pos[1] == col)
+        if (posRow == row && posCol == col)
             return true;
-        if (!pathIsFree(row, col, board) || pos[0] != row && pos[1] != col || col < 0 || row < 0 || col > 7 || row > 7)
+        if (!pathIsFree(row, col, board) || posRow != row && posCol != col || col < 0 || row < 0 || col > 7 || row > 7)
             return false;
         return true;
 
@@ -79,14 +84,16 @@ class Rook extends ChessPiece {
 }
 
 class Bishop extends ChessPiece {
-    public Bishop(int row, int col, boolean playerAboveBoard) {
-        super(row, col, playerAboveBoard);
+
+    public Bishop(int row, int col, boolean playerAboveBoard, String owner) {
+        super(row, col, playerAboveBoard, owner);
+        letter = "B";
     }
 
     public boolean canMove(int row, int col, ChessPiece[][] board) {
-        if (pos[0] == row && pos[1] == col)
+        if (posRow == row && posCol == col)
             return true;
-        if (!pathIsFree(row, col, board) || Math.abs(pos[0] - row) != Math.abs(pos[1] - col) || col < 0 || row < 0
+        if (!pathIsFree(row, col, board) || Math.abs(posRow - row) != Math.abs(posCol - col) || col < 0 || row < 0
                 || col > 7 || row > 7)
             return false;
 
@@ -95,15 +102,16 @@ class Bishop extends ChessPiece {
 }
 
 class Queen extends ChessPiece {
-    public Queen(int row, int col, boolean playerAboveBoard) {
-        super(row, col, playerAboveBoard);
+    public Queen(int row, int col, boolean playerAboveBoard, String owner) {
+        super(row, col, playerAboveBoard, owner);
+        letter = "Q";
     }
 
     public boolean canMove(int row, int col, ChessPiece[][] board) {
-        if (pos[0] == row && pos[1] == col)
+        if (posRow == row && posCol == col)
             return true;
-        if (!pathIsFree(row, col, board) || Math.abs(pos[0] - row) != Math.abs(pos[1] - col)
-                && (pos[0] != row && pos[1] != col) || col < 0 || row < 0 || col > 7 || row > 7)
+        if (!pathIsFree(row, col, board) || Math.abs(posRow - row) != Math.abs(posCol - col)
+                && (posRow != row && posCol != col) || col < 0 || row < 0 || col > 7 || row > 7)
             return false;
 
         return true;
@@ -111,31 +119,33 @@ class Queen extends ChessPiece {
 }
 
 class Knight extends ChessPiece {
-    public Knight(int row, int col, boolean playerAboveBoard) {
-        super(row, col, playerAboveBoard);
+    public Knight(int row, int col, boolean playerAboveBoard, String owner) {
+        super(row, col, playerAboveBoard, owner);
+        letter = "Kn";
     }
 
     public boolean canMove(int row, int col, ChessPiece[][] board) {
-        if (pos[0] == row && pos[1] == col)
+        if (posRow == row && posCol == col)
             return true;
         if (board[row][col] != null)
             return false;
-        if (Math.abs(pos[0] - row) == 1 && Math.abs(pos[1] - col) == 2
-                || Math.abs(pos[0] - row) == 2 && Math.abs(pos[1] - col) == 1)
+        if (Math.abs(posRow - row) == 1 && Math.abs(posCol - col) == 2
+                || Math.abs(posRow - row) == 2 && Math.abs(posCol - col) == 1)
             return true;
         return false;
     }
 }
 
 class King extends ChessPiece {
-    public King(int row, int col, boolean playerAboveBoard) {
-        super(row, col, playerAboveBoard);
+    public King(int row, int col, boolean playerAboveBoard, String owner) {
+        super(row, col, playerAboveBoard, owner);
+        letter = "K";
     }
 
     // Should be changed for Checkmate
     public boolean canMove(int row, int col, ChessPiece[][] board) {
         if (!pathIsFree(row, col, board))
             return false;
-        return Math.abs(pos[0] - row) <= 1 && Math.abs(pos[1] - col) <= 1 ? true : false;
+        return Math.abs(posRow - row) <= 1 && Math.abs(posCol - col) <= 1 ? true : false;
     }
 }

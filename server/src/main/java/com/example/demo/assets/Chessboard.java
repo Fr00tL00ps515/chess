@@ -1,0 +1,50 @@
+package com.example.demo.assets;
+
+public class Chessboard {
+    String player1;
+    String player2;
+    private ChessPiece[][] board1 = {
+            { null, null, null, null, null, null, null, null },
+            { null, null, null, null, null, null, null, null },
+            { null, null, null, null, null, null, null, null },
+            { null, null, null, null, null, null, null, null },
+            { null, null, null, null, null, null, null, null },
+            { null, null, null, null, null, null, null, null },
+            { null, null, null, null, null, null, null, null },
+            { null, null, null, null, null, null, null, null } };
+
+    private ChessPiece[][] board2 = {
+            { null, null, null, null, null, null, null, null },
+            { null, null, null, null, null, null, null, null },
+            { null, null, null, null, null, null, null, null },
+            { null, null, null, null, null, null, null, null },
+            { null, null, null, null, null, null, null, null },
+            { null, null, null, null, null, null, null, null },
+            { null, null, null, null, null, null, null, null },
+            { null, null, null, null, null, null, null, null } };
+
+    public Chessboard(String player1, String player2) {
+        this.player1 = player1;
+        for (int i = 0; i < 8; i++) {
+            board1[1][i] = new Pawn(1, i, true, null);
+            board1[6][i] = new Pawn(6, i, false, player1);
+        }
+        board1[0][0] = new Rook(0, 0, true, null);
+        board1[0][1] = new Knight(0, 1, true, null);
+        board1[0][2] = new Bishop(0, 2, true, null);
+        board1[0][3] = new Queen(0, 3, true, null);
+        board1[0][4] = new King(0, 4, true, null);
+        board1[0][5] = new Bishop(0, 5, true, null);
+        board1[0][6] = new Knight(0, 6, true, null);
+        board1[0][7] = new Rook(0, 7, true, null);
+
+        board1[7][0] = new Rook(7, 0, false, player1);
+        board1[7][1] = new Knight(7, 1, false, player1);
+        board1[7][2] = new Bishop(7, 2, false, player1);
+        board1[7][3] = new Queen(7, 3, false, player1);
+        board1[7][4] = new King(7, 4, false, player1);
+        board1[7][5] = new Bishop(7, 5, false, player1);
+        board1[7][6] = new Knight(7, 6, false, player1);
+        board1[7][7] = new Rook(7, 7, false, player1);
+    }
+}

@@ -58,27 +58,6 @@ public class DemoApplication {
 
 		}
 
-		// session.send("/app/chat", "Hello Server");
-
-		// while (!gameEnd) {
-		// printField();
-		// try {
-		// System.out.println("Chose the cell: ");
-		// in = r.readLine();
-		// objectPosition[0] = in.charAt(0) - 48;
-		// objectPosition[1] = in.charAt(2) - 48;
-		// System.out.println("Chose destination: ");
-		// in = r.readLine();
-		// objectDestination[0] = in.charAt(0) - 48;
-		// objectDestination[1] = in.charAt(2) - 48;
-		// } catch (IOException e) {
-		// return;
-		// }
-		// field[objectDestination[0]][objectDestination[1]] =
-		// field[objectPosition[0]][objectPosition[1]];
-		// field[objectPosition[0]][objectPosition[1]] = " ";
-
-		// }
 	}
 
 }

@@ -24,7 +24,7 @@ public abstract class ChessPiece {
         int oneStepBelow = 0;
         if (posRow == row && posCol == col)
             return true;
-        if (board[row][col] != null)
+        if (board[row][col] != null && board[row][col].owner.equals(this.owner))
             return false;
         oneStepBelow = (row - posRow) / Math.abs(row - posRow);
         oneStepRight = (col - posCol) / Math.abs(col - posCol);
@@ -127,7 +127,7 @@ class Knight extends ChessPiece {
     public boolean canMove(int row, int col, ChessPiece[][] board) {
         if (posRow == row && posCol == col)
             return true;
-        if (board[row][col] != null)
+        if (board[row][col] != null && board[row][col].owner.equals(this.owner))
             return false;
         if (Math.abs(posRow - row) == 1 && Math.abs(posCol - col) == 2
                 || Math.abs(posRow - row) == 2 && Math.abs(posCol - col) == 1)

@@ -81,9 +81,27 @@ public class Chessboard {
             return false;
         playersBoard[row][col] = playersBoard[posRow][posCol];
         playersBoard[posRow][posCol] = null;
-        playersBoard[7 - row][7 - col] = playersBoard[7 - posRow][7 - posCol];
-        playersBoard[7 - posRow][7 - posCol] = null;
+        otherBoard[7 - row][7 - col] = otherBoard[7 - posRow][7 - posCol];
+        otherBoard[7 - posRow][7 - posCol] = null;
         return true;
+    }
+
+    public String[][] toString(String player) {
+        ChessPiece[][] board;
+        if (player == player1)
+            board = board1;
+        else if (player == player2)
+            board = board2;
+        else {
+            return null;
+        }
+        String[][] res = new String[8][8];
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                res[row][col] = board[row][col].letter;
+            }
+        }
+        return res;
     }
 
 }

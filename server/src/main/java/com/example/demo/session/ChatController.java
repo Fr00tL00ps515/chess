@@ -7,6 +7,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import com.example.demo.assets.Chessboard;
 import com.example.demo.assets.MoveRequest;
+import com.example.demo.assets.MoveResponse;
 
 @Controller
 public class ChatController {
@@ -20,17 +21,19 @@ public class ChatController {
     private SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/new_session")
-    @SendTo("/output/messages")
-    public String[][] createNewSession(Greeting greeting) {
+    public void createNewSession(Greeting greeting) {
         if (player1 == null) {
             player1 = greeting.text();
             System.out.println(player1);
-            return null;
+            messagingTemplate.convertAndSendToUser(player1, "/output/move", new MoveResponse(null, false));
+
+        } else {
+            player2 = greeting.text();
+            System.out.println(player2);
+            board = new Chessboard(player1, player2);
+            messagingTemplate.convertAndSendToUser(player2, "/output/move", new MoveResponse(null, true));
         }
-        player2 = greeting.text();
-        System.out.println(player2);
-        board = new Chessboard(player1, player2);
-        return board.toString(player1);
+
     }
 
     @MessageMapping("/player1")

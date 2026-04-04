@@ -37,14 +37,15 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter {
 
     @Override
     public void handleFrame(StompHeaders headers, Object payload) {
-        if (payload == null)
-            return;
         MoveResponse response = (MoveResponse) payload;
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                DemoApplication.board[row][col] = response.board()[row][col];
+        if (response.board() != null) {
+            for (int row = 0; row < 8; row++) {
+                for (int col = 0; col < 8; col++) {
+                    DemoApplication.board[row][col] = response.board()[row][col];
+                }
             }
         }
+
         DemoApplication.myTurn = response.myTurn();
     }
 }

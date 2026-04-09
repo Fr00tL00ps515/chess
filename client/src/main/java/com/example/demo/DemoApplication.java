@@ -19,15 +19,7 @@ import com.example.demo.messages.*;
 @SpringBootApplication
 public class DemoApplication {
 
-	public static String[][] board = {
-			{ "5", "4", "3", "2", "1", "3", "4", "5" },
-			{ "6", "6", "6", "6", "6", "6", "6", "6" },
-			{ " ", " ", " ", " ", " ", " ", " ", " " },
-			{ " ", " ", " ", " ", " ", " ", " ", " " },
-			{ " ", " ", " ", " ", " ", " ", " ", " " },
-			{ " ", " ", " ", " ", " ", " ", " ", " " },
-			{ "6", "6", "6", "6", "6", "6", "6", "6" },
-			{ "5", "4", "3", "2", "1", "3", "4", "5" } };
+	public static String[][] board = null;
 
 	private static void printBoard() {
 		for (String[] i : board) {
@@ -35,13 +27,15 @@ public class DemoApplication {
 		}
 	}
 
-	private static boolean game = false;
+	private static boolean game = true;
 	public static boolean myTurn = false;
+	public static String player;
 	private static int[] objectPosition = new int[2];
 	private static int[] objectDestination = new int[2];
 	private static BufferedReader r = new BufferedReader(
 			new InputStreamReader(System.in));
 	private static String in = "";
+	private static String name;
 
 	public static void main(String[] args) {
 		WebSocketStompClient stompClient = new WebSocketStompClient(new StandardWebSocketClient());
@@ -53,9 +47,18 @@ public class DemoApplication {
 		try {
 			session = future.get();
 		} catch (Exception e) {
+			System.out.println("Cant reach the server");
 			return;
 		}
-		printBoard();
+
+		session.send("/input/join_game", new Greeting(session.getSessionId()));
+		while (board == null) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				return;
+			}
+		}
 		while (game) {
 			while (!myTurn) {
 				try {
@@ -69,9 +72,10 @@ public class DemoApplication {
 				in = r.readLine();
 			} catch (IOException e) {
 			}
-			if (in.equals("exit"))
-				game = false;
-			else {
+			if (in.equals("exit")) {
+				session.send("/input/leave_game", new Greeting(session.getSessionId()));
+				return;
+			} else {
 				objectPosition[0] = in.charAt(0) - 48;
 				objectPosition[1] = in.charAt(1) - 48;
 			}
@@ -81,14 +85,16 @@ public class DemoApplication {
 				in = r.readLine();
 			} catch (IOException e) {
 			}
-			if (in.equals("exit"))
-				game = false;
-			else {
+			if (in.equals("exit")) {
+				session.send("/input/leave_game", new Greeting(session.getSessionId()));
+				return;
+			} else {
 				objectDestination[0] = in.charAt(0) - 48;
 				objectDestination[1] = in.charAt(1) - 48;
 			}
 
-			session.send("/input/player1", new MoveRequest(objectDestination[0], objectPosition[1],
+			myTurn = false;
+			session.send("/input/" + player, new MoveRequest(objectPosition[0], objectPosition[1],
 					objectDestination[0], objectDestination[1], session.getSessionId()));
 
 		}

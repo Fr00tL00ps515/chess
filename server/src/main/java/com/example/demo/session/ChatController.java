@@ -7,66 +7,90 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import com.example.demo.assets.Chessboard;
 import com.example.demo.assets.MoveRequest;
-import com.example.demo.assets.MoveResponse;
+import com.example.demo.assets.Response;
+import com.example.demo.assets.Greeting;
 
 @Controller
 public class ChatController {
 
-    private Chessboard board;
+    private Chessboard board = new Chessboard("player1", "player2");;
     private String player1;
     private String player2;
-    private int gameCounter = 0;
+    private String myTurn;
+    private boolean gameStarted = false;
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/new_session")
-    public void createNewSession(Greeting greeting) {
+    @MessageMapping("/join_game")
+    public void joinGame(Greeting greeting) {
+        System.out.println(greeting.text() + " wants to join the game");
         if (player1 == null) {
             player1 = greeting.text();
-            System.out.println(player1);
-            messagingTemplate.convertAndSendToUser(player1, "/output/move", new MoveResponse(null, false));
+            messagingTemplate.convertAndSend("/output/move" + player1,
+                    new Response("player1", board.toString("player1"),
+                            gameStarted && myTurn.equals("player1") ? true : false));
 
-        } else {
+        } else if (player2 == null) {
             player2 = greeting.text();
-            System.out.println(player2);
-            board = new Chessboard(player1, player2);
-            messagingTemplate.convertAndSendToUser(player2, "/output/move", new MoveResponse(null, true));
+            messagingTemplate.convertAndSend("/output/move" + player2,
+                    new Response("player2", board.toString("player2"),
+                            !gameStarted || myTurn.equals("player2") ? true : false));
+            if (!gameStarted)
+                gameStarted = true;
         }
+        // TODO: add the third case
+    }
 
+    @MessageMapping("/leave_game")
+    public void leaveGame(Greeting greeting) {
+        String id = greeting.text();
+        if (id.equals(player1))
+            player1 = null;
+        else if (id.equals(player2))
+            player2 = null;
+        // TODO: add the third case
+    }
+
+    @MessageMapping("/test")
+    @SendTo("/output")
+    public Greeting test(Greeting message) {
+        System.out.println("Got a message: " + message);
+        return new Greeting("Server says HI");
     }
 
     @MessageMapping("/player1")
     public void handleMove1(MoveRequest move) {
-        if (!player1.equals(move.id()))
-            ;
+
         System.out.println("player1 wants make a move");
-        if (gameCounter != 0) {
-            messagingTemplate.convertAndSendToUser(player1, "/output/move", null);
+
+        if (!board.movePiece(move.posRow(), move.posCol(), move.row(), move.col(), "player1")) {
+            System.out.println("Move is not allowed");
+            messagingTemplate.convertAndSend("/output/move" + player1,
+                    new Response(null, board.toString("player1"), true));
             return;
         }
-        if (!board.movePiece(move.posRow(), move.posCol(), move.row(), move.col(), player1)) {
-            messagingTemplate.convertAndSendToUser(player1, "/output/move", null);
-            return;
-        }
-        messagingTemplate.convertAndSendToUser(player1, "/output/move", board.toString(player1));
-        messagingTemplate.convertAndSendToUser(player2, "/output/move", board.toString(player2));
-        gameCounter = 1;
+        messagingTemplate.convertAndSend("/output/move" + player1,
+                new Response(null, board.toString("player1"), false));
+        messagingTemplate.convertAndSend("/output/move" + player2,
+                new Response(null, board.toString("player2"), true));
+        myTurn = "player2";
     }
 
     @MessageMapping("/player2")
     public void handleMove2(MoveRequest move) {
         System.out.println("player2 wants make a move");
-        if (gameCounter != 1) {
-            messagingTemplate.convertAndSendToUser(player2, "/output/move", null);
+
+        if (!board.movePiece(move.posRow(), move.posCol(), move.row(), move.col(), "player2")) {
+            System.out.println("Move is not allowed");
+            messagingTemplate.convertAndSend("/output/move" + player2,
+                    new Response(null, board.toString("player2"), true));
             return;
         }
-        if (!board.movePiece(move.posRow(), move.posCol(), move.row(), move.col(), player2)) {
-            messagingTemplate.convertAndSendToUser(player2, "/output/move", null);
-            return;
-        }
-        messagingTemplate.convertAndSendToUser(player1, "/output/move", board.toString(player1));
-        messagingTemplate.convertAndSendToUser(player2, "/output/move", board.toString(player2));
-        gameCounter = 0;
+        messagingTemplate.convertAndSend("/output/move" + player1,
+                new Response(null, board.toString("player1"), true));
+        messagingTemplate.convertAndSend("/output/move" + player2,
+                new Response(null, board.toString("player2"), false));
+        myTurn = "player1";
     }
 }

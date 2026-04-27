@@ -51,7 +51,7 @@ async function sign_in(elements: any, restIp: String): Promise<void> {
     password: elements.passInput.value,
   };
 
-  let response: any = (
+  let response: any = await (
     await fetch(restIp + "" + "/sign_in", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -59,7 +59,7 @@ async function sign_in(elements: any, restIp: String): Promise<void> {
     })
   ).json();
 
-  console.log(response ? "Cant sign in" : "Signed in");
+  console.log(response ? "Signed in" : "Cant sign in");
 }
 
 async function register(elements: any, restIp: String) {
@@ -68,7 +68,7 @@ async function register(elements: any, restIp: String) {
     password: elements.passInput.value,
   };
 
-  let response: any = (
+  let response: any = await (
     await fetch(restIp + "" + "/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -76,5 +76,5 @@ async function register(elements: any, restIp: String) {
     })
   ).json();
 
-  console.log(response ? "Registration succeeded" : "Registration failed");
+  document.createElement("p");
 }

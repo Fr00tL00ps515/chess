@@ -2,7 +2,7 @@ package com.example.demo.rest;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.assets.Auth;
+import com.example.demo.assets.UserData;
 
 import ch.qos.logback.core.joran.spi.HttpUtil.RequestMethod;
 
@@ -20,26 +20,31 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 public class GreetingController {
 
-    Set<Auth> auths = new HashSet<>();
+    Set<UserData> users = new HashSet<>();
 
     @PostMapping("/sign_in")
-    public boolean signIn(@RequestBody Auth other) {
-        System.out.println("Got request");
-        for (Auth auth : auths) {
-            if (auth.userName().equals(other.userName())) {
-                return auth.password().equals(other.password()) ? true : false;
+    public boolean signIn(@RequestBody UserData other) {
+
+        boolean res = false;
+        System.out.println("acounts: " + users.size());
+        for (UserData user : users) {
+            if (user.userName().equals(other.userName())) {
+                res = user.password().equals(other.password()) ? true : false;
             }
         }
-        return false;
+        return res;
     }
 
     @PostMapping("/register")
-    public boolean register(@RequestBody Auth other) {
-        for (Auth auth : auths) {
-            if (auth.userName().equals(other.userName()))
+    public boolean register(@RequestBody UserData other) {
+        System.out.println("acounts: " + users.size());
+        for (UserData user : users) {
+            if (user.userName().equals(other.userName()))
                 return false;
         }
-        auths.add(other);
+        users.add(other);
+        System.out.println("acounts: " + ((UserData) users.toArray()[0]).userName());
+
         return true;
     }
 

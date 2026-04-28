@@ -1,3 +1,5 @@
+import { create_main_page } from "./main_page.js";
+
 export function create_login_page(document: Document, restIp: String): void {
   const elements = {
     title: document.createElement("h1"),
@@ -39,15 +41,15 @@ export function create_login_page(document: Document, restIp: String): void {
     container.appendChild(elements.form);
 
     elements.submitBtn.addEventListener("click", () =>
-      sign_in(elements, restIp),
+      sign_in(container, elements, restIp),
     );
     elements.regBtn.addEventListener("click", () => register(elements, restIp));
   }
 }
 
-async function sign_in(elements: any, restIp: String): Promise<void> {
+async function sign_in(container: any, elements: any, restIp: String) {
   let message = {
-    user_name: elements.userInput.value,
+    userName: elements.userInput.value,
     password: elements.passInput.value,
   };
 
@@ -59,12 +61,16 @@ async function sign_in(elements: any, restIp: String): Promise<void> {
     })
   ).json();
 
-  console.log(response ? "Signed in" : "Cant sign in");
+  if (!response.inSystem) {
+    console.log("Something went wrong");
+  } else {
+    create_main_page(document, container, response);
+  }
 }
 
 async function register(elements: any, restIp: String) {
   let message = {
-    user_name: elements.userInput.value,
+    userName: elements.userInput.value,
     password: elements.passInput.value,
   };
 
@@ -76,5 +82,7 @@ async function register(elements: any, restIp: String) {
     })
   ).json();
 
-  document.createElement("p");
+  let registered = document.createElement("p");
+  elements.form.appendChild(registered);
+  registered.innerHTML = "REGISTERED";
 }

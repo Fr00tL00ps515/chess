@@ -2,6 +2,7 @@ package com.example.demo.rest;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.assets.AuthData;
 import com.example.demo.assets.UserData;
 
 import ch.qos.logback.core.joran.spi.HttpUtil.RequestMethod;
@@ -23,26 +24,27 @@ public class GreetingController {
     Set<UserData> users = new HashSet<>();
 
     @PostMapping("/sign_in")
-    public boolean signIn(@RequestBody UserData other) {
+    public UserData signIn(@RequestBody AuthData other) {
 
-        boolean res = false;
+        UserData res = new UserData(false);
         System.out.println("acounts: " + users.size());
         for (UserData user : users) {
-            if (user.userName().equals(other.userName())) {
-                res = user.password().equals(other.password()) ? true : false;
+            if (user.userName().equals(other.userName()) && user.password().equals(other.password())) {
+                System.out.println("Sign in sucessfull");
+                res = user;
             }
         }
         return res;
     }
 
     @PostMapping("/register")
-    public boolean register(@RequestBody UserData other) {
+    public boolean register(@RequestBody AuthData other) {
         System.out.println("acounts: " + users.size());
         for (UserData user : users) {
             if (user.userName().equals(other.userName()))
                 return false;
         }
-        users.add(other);
+        users.add(new UserData(true, other.userName(), other.password(), 0, 0));
         System.out.println("acounts: " + ((UserData) users.toArray()[0]).userName());
 
         return true;
